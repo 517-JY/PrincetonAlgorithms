@@ -5,46 +5,49 @@
  **************************************************************************** */
 
 import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
-    private WeightedQuickUnionUF uf;
-    // occupied[i][j] = false [i][j] is blocked
-    // openSite[i][j] = true  [i][j] is open
-    private boolean[][] openSite;
+    // The private instance (or static) variable 'uf' can be made 'final';
+    private final WeightedQuickUnionUF uf;
+    private boolean[][] openSite; // occupied[i][j] = false [i][j] is blocked, true if is open
     private int numberOfOpenSites; // number of open sites
-
 
     // Creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
         if (n <= 0) {
             throw new IllegalArgumentException("Constructor parameter " + n + " is less than 0");
         }
+        // Adds an outer layer that wraps the valid n * n grid
         uf = new WeightedQuickUnionUF((n + 2) * (n + 2));
         openSite = new boolean[n + 2][n + 2];
         numberOfOpenSites = 0;
         for (int i = 0; i < n + 2; i++) {
             for (int j = 0; j < n + 2; j++) {
-                // initialize all sites to be blocked
-                openSite[i][j] = false;
+                openSite[i][j] = false; // initialize all sites to be blocked
             }
         }
-
         openSite[0][0] = true;
         openSite[n + 1][0] = true;
-        // make all sites in the first valid row connected to the virtual top site (0)
+
+        // makes all sites in the first valid row connected to the virtual top site (0)
         for (int i = 1; i <= n; i++) {
             uf.union(0, n + 2 + i);
         }
-
-        // make all sites in the first valid row connected to the virtual bottom site (n+1)*(n+2)
+        // makes all sites in the last valid row connected to the virtual bottom site (n+1)*(n+2)
         for (int i = 1; i <= n; i++) {
             uf.union((n + 1) * (n + 2), n * (n + 2) + i);
         }
     }
 
 
-    // opens the site(row, col) if it is not open already
+    /**
+     * Opens the site(row, col) if it is not open already
+     *
+     * @param row the given row index
+     * @param col the given col index
+     */
     public void open(int row, int col) {
         // StdOut.println("Testing: Inside open");
         validateRange(row, col);
@@ -80,19 +83,33 @@ public class Percolation {
         }
     }
 
-    // is the site(row, col) open?
+
+    /**
+     * Checks whether the site is open with the given index
+     *
+     * @param row the given row index
+     * @param col the given col index
+     * @return true if the site is open, false otherwise
+     */
     public boolean isOpen(int row, int col) {
         // StdOut.println("Testing: Inside isOpen");
-        // validateRange(row, col);
+        isFullValidateRange(row, col);
         return openSite[row][col];
     }
 
-    // is the site (row, col) full?
+
+    /**
+     * Checks whether the site is full or not
+     *
+     * @param row the given row index
+     * @param col the given col index
+     * @return true if there is a path between the virtual top site and the current site
+     */
     public boolean isFull(int row, int col) {
         // StdOut.println("Testing: Inside isFull");
-        // validateRange(row, col);
+        isFullValidateRange(row, col);
         int index = row * openSite.length + col;
-        if (isOpen(row, col)) {
+        if (isOpen(row, col) && numberOfOpenSites != 0) {
             // StdOut.println("Testing:");
             // StdOut.println("uf.find(0) = " + uf.find(0));
             // StdOut.println("uf.find(index)  = " + uf.find(index));
@@ -101,13 +118,16 @@ public class Percolation {
         return false;
     }
 
-    // returns the number of open sites
+
+    /**
+     * Returns the number of open sites
+     *
+     * @return the number of open sites
+     */
     public int numberOfOpenSites() {
         return numberOfOpenSites;
     }
-
-    // does the system percolate?
-    // Check wehther the virtual top site and virtual bottom site are in the same componenet
+    
 
     /**
      * Checks whether the virtual top site and the virtual bottom site are in the same component
@@ -131,13 +151,28 @@ public class Percolation {
      */
     private void validateRange(int row, int col) {
         if (row < 1 || row > openSite.length - 2) {
-            throw new IllegalArgumentException(
-                    "row index " + row + " is outside the provided range");
+            throw new IllegalArgumentException("row index " + row + " out of bounds");
         }
 
         if (col < 1 || col > openSite[row].length - 2) {
-            throw new IllegalArgumentException(
-                    "col index " + col + " is outside the provided range");
+            throw new IllegalArgumentException("col index " + col + " out of bounds");
+        }
+    }
+
+
+    /**
+     * Validates both row and col is valid index
+     *
+     * @param row the given row index
+     * @param col the given col index
+     */
+    private void isFullValidateRange(int row, int col) {
+        if (row < 0 || row > openSite.length - 1) {
+            throw new IllegalArgumentException("row index " + row + " out of bounds");
+        }
+
+        if (col < 0 || col > openSite[0].length - 1) {
+            throw new IllegalArgumentException("col index " + col + " out of bounds");
         }
     }
 
@@ -152,7 +187,7 @@ public class Percolation {
             // StdOut.println("Once open site at row: " + row + " col: " + col + ".");
             // StdOut.println("The system is percolate or not ? " + perc.percolates());
         }
-        // StdOut.println("Open site number is " + perc.numberOfOpenSites());
-        // StdOut.println("The system is percolate or not ? " + perc.percolates());
+        StdOut.println("Open site number is " + perc.numberOfOpenSites());
+        StdOut.println("The system is percolate or not ? " + perc.percolates());
     }
 }

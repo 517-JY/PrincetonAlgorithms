@@ -9,14 +9,17 @@ import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
 
 public class PercolationStats {
+    // Because 1.96 will be used more than once
+    private static final double CONFIDENCE_95 = 1.96;
     // perform independent trails on an n-by-n grid
 
-    private double[] threasholds;
-    private int trials;
-    private Percolation perc;
+    // The private instance (or static) variable 'threasholds' can be made 'final';
+    private final double[] threasholds;
+
+    // The private instance (or static) variable 'trials' can be made 'final';
+    private final int trials;
 
     public PercolationStats(int n, int trials) {
-
         if (n <= 0) {
             throw new IllegalArgumentException("Parameter n " + n + " should be greater than 0");
         }
@@ -30,7 +33,7 @@ public class PercolationStats {
         this.trials = trials;
 
         for (int i = 0; i < trials; i++) {
-            perc = new Percolation(n);
+            Percolation perc = new Percolation(n);
             while (!perc.percolates()) {
                 // Returns a random integer uniformly in [1, n + 1). as row index
                 int row = StdRandom.uniform(n) + 1;
@@ -38,7 +41,6 @@ public class PercolationStats {
                 int col = StdRandom.uniform(n) + 1;
                 perc.open(row, col);
             }
-
             threasholds[i] = perc.numberOfOpenSites() * 1.0 / (n * n);
         }
     }
@@ -55,12 +57,12 @@ public class PercolationStats {
 
     // low endpoint of 95% confidence interval
     public double confidenceLo() {
-        return mean() - 1.96 * stddev() / Math.sqrt(trials);
+        return mean() - CONFIDENCE_95 * stddev() / Math.sqrt(trials);
     }
 
     // high endpoint of 95% confidence interval
     public double confidenceHi() {
-        return mean() + 1.96 * stddev() / Math.sqrt(trials);
+        return mean() + CONFIDENCE_95 * stddev() / Math.sqrt(trials);
     }
 
 
