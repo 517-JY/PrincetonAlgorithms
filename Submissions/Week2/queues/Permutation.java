@@ -25,9 +25,11 @@ public class Permutation {
         // StdOut.println("Size of queue is " + queue.size());
 
         for (String s : queue) {
-            StdOut.println(s);
-            j++;
-            if (j == k) {
+            if (j < k) {
+                StdOut.println(s);
+                j++;
+            }
+            else {
                 break;
             }
         }
